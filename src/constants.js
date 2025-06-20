@@ -1,3 +1,3 @@
-const DB_NAME = "indusDocx";
+const DB_NAME = "indus-docx";
 
 export { DB_NAME };
