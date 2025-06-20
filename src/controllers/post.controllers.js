@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Post } from "../models/post.models.js";
+import uploadOnCloudinary from "../utils/cloudinary.js";
 const createPost = asyncHandler(async (req, res) => {
   const {
     title,
@@ -46,4 +47,22 @@ const createPost = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(200, createdPost, "Post created Successfully"));
 });
-export { createPost };
+const uploadThumbnail = asyncHandler(async (req, res) => {
+  const thumbnailLocalPath = req?.file?.path;
+  const postId = req.params.id;
+  const postExist = await Post.findById(postId);
+  if (!postExist) {
+    throw new ApiError(404, "Post is not exist");
+  }
+  if (!thumbnailLocalPath) {
+    throw new ApiError(404, "Thumbnail local path is required");
+  }
+  const cloudinaryResponse = await uploadOnCloudinary(thumbnailLocalPath);
+  postExist.thumbnail = cloudinaryResponse?.url || postExist.url;
+  postExist.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, postExist, "Thumbnail uploaded"));
+});
+export { createPost, uploadThumbnail };
