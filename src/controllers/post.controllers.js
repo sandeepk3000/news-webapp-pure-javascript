@@ -21,17 +21,9 @@ const createPost = async ({
 }) => {
   try {
     if (
-      [
-        title,
-        content,
-        author,
-        category,
-        country,
-        state,
-        city,
-        status,
-        authorId,
-      ].some((field) => field?.trim() === "")
+      [title, content, author, category, country, state, city, authorId].some(
+        (field) => field?.trim() === "",
+      )
     ) {
       throw new ApiError(400, "All fields are required");
     }
@@ -91,7 +83,16 @@ const publishPost = asyncHandler(async (req, res) => {
       new ApiResponse(200, publishedPost, "Post is published Successfully"),
     );
 });
-
+const savePost = asyncHandler(async (req, res) => {
+  const postId = req.params.id;
+  let post = null;
+  if (postId) {
+    post = await updatePost(postId, req.body);
+  } else {
+    post = await createPost(req.body);
+  }
+  return res.status(201).json(new ApiResponse(200, post, "Post is saved"));
+});
 const uploadThumbnail = asyncHandler(async (req, res) => {
   const thumbnailLocalPath = req?.file?.path;
   const postId = req.params.id;
@@ -110,4 +111,4 @@ const uploadThumbnail = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, postExist, "Thumbnail uploaded"));
 });
-export { publishPost, uploadThumbnail };
+export { publishPost, savePost, uploadThumbnail };
