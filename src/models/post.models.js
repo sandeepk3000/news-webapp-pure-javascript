@@ -11,7 +11,6 @@ const postSchema = new mongoose.Schema(
         },
         thumbnail: {
             type: String,
-            required: true,
         },
         source: {
             type: String,
@@ -46,7 +45,7 @@ const postSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ["PENDING", "PUBLISHED", "REJECTED", "SCHEDULED", "DRAFT"],
-            default: "PENDING",
+            default: "DRAFT",
         },
         views: {
             type: Number,
@@ -66,7 +65,6 @@ const postSchema = new mongoose.Schema(
         },
         publishedAt: {
             type: Date,
-            required: true,
         },
     },
     {
