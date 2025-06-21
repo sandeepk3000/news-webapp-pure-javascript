@@ -3,50 +3,95 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Post } from "../models/post.models.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
-const createPost = asyncHandler(async (req, res) => {
-  const {
-    title,
-    description,
-    author,
-    publishedAt,
-    category,
-    language,
-    content,
-    country,
-    source,
-    authorId,
-    tags,
-    thumbnail,
-  } = req.body;
-  if (
-    [title, description, content, author, category, country, authorId].some(
-      (field) => field?.trim() === "",
-    )
-  ) {
-    throw new ApiError(400, "All fields are required");
+const createPost = async ({
+  title,
+  content,
+  author,
+  publishedAt,
+  status,
+  category,
+  language,
+  country,
+  state,
+  city,
+  source,
+  authorId,
+  tags,
+  thumbnail,
+}) => {
+  try {
+    if (
+      [
+        title,
+        content,
+        author,
+        category,
+        country,
+        state,
+        city,
+        status,
+        authorId,
+      ].some((field) => field?.trim() === "")
+    ) {
+      throw new ApiError(400, "All fields are required");
+    }
+    const post = await Post.create({
+      title,
+      content,
+      author,
+      publishedAt,
+      status,
+      category,
+      language,
+      country,
+      state,
+      city,
+      source,
+      authorId,
+      tags,
+      thumbnail,
+    });
+    if (!post) {
+      throw new ApiError(500, "Something went wrong while creating the post");
+    }
+    return post;
+  } catch (error) {
+    throw new ApiError(500, error.message);
   }
-  const post = await Post.create({
-    title,
-    description,
-    content,
-    author,
-    publishedAt,
-    category,
-    language,
-    country,
-    source,
-    authorId,
-    tags,
-    thumbnail,
-  });
-  const createdPost = await Post.findById(post._id);
-  if (!createdPost) {
-    throw new ApiError(500, "Something went wrong while creating the post");
+};
+const updatePost = async (postId, data) => {
+  try {
+    const postExist = await Post.findById(postId);
+    if (!postExist) {
+      throw new ApiError(404, "Post is not exist");
+    }
+    const updatedPost = await Post.findByIdAndUpdate(postId, data, {
+      new: true,
+    });
+    if (!updatedPost) {
+      throw new ApiError(500, "Something went wrong while updating the post");
+    }
+    return updatedPost;
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
+
+const publishPost = asyncHandler(async (req, res) => {
+  const postId = req.params.id;
+  let publishedPost = null;
+  if (!postId) {
+    publishedPost = await createPost(req.body);
+  } else {
+    publishedPost = await updatePost(postId, req.body);
   }
   return res
     .status(201)
-    .json(new ApiResponse(200, createdPost, "Post created Successfully"));
+    .json(
+      new ApiResponse(200, publishedPost, "Post is published Successfully"),
+    );
 });
+
 const uploadThumbnail = asyncHandler(async (req, res) => {
   const thumbnailLocalPath = req?.file?.path;
   const postId = req.params.id;
@@ -65,4 +110,4 @@ const uploadThumbnail = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, postExist, "Thumbnail uploaded"));
 });
-export { createPost, uploadThumbnail };
+export { publishPost, uploadThumbnail };
