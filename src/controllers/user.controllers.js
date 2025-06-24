@@ -2,7 +2,6 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.models.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -93,21 +92,5 @@ const loginUser = asyncHandler(async (req, res) => {
       ),
     );
 });
-const uploadAvatar = asyncHandler(async (req, res) => {
-  const avatarLocalPath = req?.file?.path;
-  const userExist = await User.findById(req.user._id);
-  if (!userExist) {
-    throw new ApiError(404, "User is not reqister or login");
-  }
-  console.log(avatarLocalPath);
-  if (!avatarLocalPath) {
-    throw new ApiError(404, "Avatar local path is required");
-  }
-  const cloudinaryResponse = await uploadOnCloudinary(avatarLocalPath);
-  userExist.avatar = cloudinaryResponse?.url || "";
-  userExist.save();
-  return res
-    .status(200)
-    .json(new ApiResponse(200, userExist, "Avatar is uloaded"));
-});
-export { registerUser, loginUser, uploadAvatar };
+
+export { registerUser, loginUser };
