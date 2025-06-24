@@ -5,6 +5,10 @@ const postSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        slug: {
+            type: String,
+            required: true,
+        },
         content: {
             type: String,
             required: true,
@@ -44,7 +48,7 @@ const postSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["PENDING", "PUBLISHED", "REJECTED", "SCHEDULED", "DRAFT"],
+            enum: ["PENDING", "PUBLISH", "REJECT", "SCHEDULE", "DRAFT"],
             default: "DRAFT",
         },
         views: {
