@@ -2,7 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Post } from "../models/post.models.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+
 const setStatus = (publishedAt, status) => {
   if (status === "SCHEDULE" && new Date(publishedAt) < new Date()) {
     return "PUBLISH";
