@@ -1,0 +1,15 @@
+import dotenvFlow from "dotenv-flow";
+dotenvFlow.config();
+export const {
+  ENV,
+  MONGODB_URL,
+  CORS_ORIGIN,
+  CLOUDINARY_API_SECRET,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_CLOUD_NAME,
+  ACCESS_TOKEN_SECRET,
+  ACCESS_TOKEN_EXPIRY,
+  REFRESH_TOKEN_SECRET,
+  REFRESH_TOKEN_EXPIRY,
+  PORT,
+} = process.env;
