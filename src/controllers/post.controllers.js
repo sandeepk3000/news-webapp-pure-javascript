@@ -31,7 +31,7 @@ const createPost = asyncHandler(async (req, res) => {
       (field) => field?.trim() === "",
     )
   ) {
-    throw new ApiError(400, "All fields are required");
+    throw new ApiError(req, 400, "All fields are required");
   }
 
   const post = await Post.create({
@@ -50,6 +50,6 @@ const createPost = asyncHandler(async (req, res) => {
     isBreaking,
     thumbnail,
   });
-  return res.status(201).json(new ApiResponse(201, post, "Post created"));
+  return res.status(201).json(new ApiResponse(req, 201, post, "Post created"));
 });
 export { createPost };

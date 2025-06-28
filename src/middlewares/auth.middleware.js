@@ -8,14 +8,14 @@ const jwtVerify = asyncHandler(async (req, _, next) => {
     req.cookies?.accessToken ||
     req.headers("Authorization")?.replace("Bearer ", "");
   if (!token) {
-    throw new ApiError(401, "Unauthorized request");
+    throw new ApiError(req,401, "Unauthorized request");
   }
   const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   const user = await User.findById(decodedToken?._id).select(
     "-refreshToken -password",
   );
   if (!user) {
-    throw new ApiError(404, "User is not signup");
+    throw new ApiError(req,404, "User is not signup");
   }
   req.user = user;
   next();

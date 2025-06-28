@@ -12,6 +12,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
     return { accessToken, refreshToken };
   } catch {
     throw new ApiError(
+      req,
       500,
       "Something went wrong while generating referesh and access token",
     );
@@ -24,14 +25,14 @@ const registerUser = asyncHandler(async (req, res) => {
       (field) => field?.trim() === "",
     )
   ) {
-    throw new ApiError(400, "All fields are required");
+    throw new ApiError(req, 400, "All fields are required");
   }
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   console.log(existedUser);
   if (existedUser) {
-    throw new ApiError(409, "User with email already exists");
+    throw new ApiError(req, 409, "User with email already exists");
   }
   const user = await User.create({
     username,
@@ -44,11 +45,17 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken",
   );
   if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user");
+    throw new ApiError(
+      req,
+      500,
+      "Something went wrong while registering the user",
+    );
   }
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+    .json(
+      new ApiResponse(req, 200, createdUser, "User registered Successfully"),
+    );
 });
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +71,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials");
+    throw new ApiError(req, 401, "Invalid user credentials");
   }
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
     user._id,
@@ -82,6 +89,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("refreshToken", refreshToken, options)
     .json(
       new ApiResponse(
+        req,
         200,
         {
           user: loggedInUser,

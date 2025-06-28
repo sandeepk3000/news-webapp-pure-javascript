@@ -25,6 +25,7 @@ const deleteFromCloudinary = async (publicId) => {
     return response;
   } catch {
     throw new ApiError(
+      req,
       500,
       "Something went wrong while deleting from cloudinary",
     );
