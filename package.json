@@ -5,6 +5,7 @@
   "type": "module",
   "main": "./src/server.js",
   "scripts": {
+    "prepare": "husky",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js",
     "start": "cross-env NODE_ENV=production nodemon src/server.js",
     "prepare": "husky"
